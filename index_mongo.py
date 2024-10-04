@@ -1,9 +1,9 @@
 #-------------------------------------------------------------------------
-# AUTHOR: your name
-# FILENAME: title of the source file
-# SPECIFICATION: description of the program
+# AUTHOR: Matthew Plascencia
+# FILENAME: index_mongo.py
+# SPECIFICATION: A program that creates the user interface for a python user indexer
 # FOR: CS 5180- Assignment #2
-# TIME SPENT: how long it took you to complete the assignment
+# TIME SPENT: 5Hours
 #-----------------------------------------------------------*/
 
 from pymongo import MongoClient  
