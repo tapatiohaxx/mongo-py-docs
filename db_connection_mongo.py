@@ -8,9 +8,9 @@
 from pymongo import MongoClient
 
 def connectDataBase():
-    client = MongoClient("mongodb://localhost:27017/")
-    
-    db = client['']  
+   client = MongoClient("mongodb://localhost:27017/")
+    db_name = input("Enter the name of the database you want to manipulate: ")
+    db = client[db_name]  
     return db
 
 def createDocument(collection, docId, docText, docTitle, docDate, docCat):
@@ -40,19 +40,30 @@ def deleteDocument(collection, docId):
     collection.delete_one({"_id": int(docId)})
     print("Document deleted successfully.")
 
-def getIndex(collection):
-    index = {}
-    cursor = collection.find()
-    for doc in cursor:
-        words = doc['text'].split()
-        for word in words:
-            cleaned_word = word.lower().strip(",.!?")
-            if cleaned_word in index:
-                if doc['title'] in index[cleaned_word]:
-                    index[cleaned_word][doc['title']] += 1
-                else:
-                    index[cleaned_word][doc['title']] = 1
+def generate_inverted_index(db, collection_name):
+    collection = db[collection_name]
+    inverted_index = {}
+
+    documents = collection.find()
+   
+    for doc in documents:
+        
+        terms = re.findall(r'\b\w+\b', doc['text'].lower())  
+        term_counts = Counter(terms)  
+        
+        for term, count in term_counts.items():
+            if term not in inverted_index:
+                inverted_index[term] = {}
+            if doc['title'] in inverted_index[term]:
+                inverted_index[term][doc['title']] += count
             else:
-                index[cleaned_word] = {doc['title']: 1}
-    sorted_index = {k: index[k] for k in sorted(index)}
-    return sorted_index
+                inverted_index[term][doc['title']] = count
+
+    
+    sorted_inverted_index = {term: inverted_index[term] for term in sorted(inverted_index)}
+
+    formatted_output = {}
+    for term, docs in sorted_inverted_index.items():
+        formatted_output[term] = ', '.join([f'{title}:{count}' for title, count in docs.items()])
+
+    return formatted_output
