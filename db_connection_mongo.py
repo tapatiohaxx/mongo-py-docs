@@ -1,3 +1,10 @@
+#-------------------------------------------------------------------------
+# AUTHOR: Matthew Plascencia
+# FILENAME: db_connection_mongo.py
+# SPECIFICATION: back end for adding documents to the database in mongdb.
+# FOR: CS 5180- Assignment #2
+# TIME SPENT: 5 hours
+#-----------------------------------------------------------*/
 
 from pymongo import MongoClient
 import datetime
