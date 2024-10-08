@@ -1,9 +1,9 @@
 #-------------------------------------------------------------------------
-# AUTHOR: Matthew Plascencia
-# FILENAME: index_mongo.py
-# SPECIFICATION: A program that creates the user interface for a python user indexer
+# AUTHOR: your name
+# FILENAME: title of the source file
+# SPECIFICATION: description of the program
 # FOR: CS 5180- Assignment #2
-# TIME SPENT: 5Hours
+# TIME SPENT: how long it took you to complete the assignment
 #-----------------------------------------------------------*/
 
 from pymongo import MongoClient  
@@ -37,7 +37,7 @@ if __name__ == '__main__':
               docId = input("Enter the ID of the document: ")
               docText = input("Enter the text of the document: ")
               docTitle = input("Enter the title of the document: ")
-              docDate = input("Enter the date of the document: ")
+              docDate = input("Enter the date of the document (YYYY-MM-DD): ")
               docCat = input("Enter the category of the document: ")
 
               createDocument(documents, docId, docText, docTitle, docDate, docCat)
@@ -47,7 +47,7 @@ if __name__ == '__main__':
               docId = input("Enter the ID of the document: ")
               docText = input("Enter the text of the document: ")
               docTitle = input("Enter the title of the document: ")
-              docDate = input("Enter the date of the document: ")
+              docDate = input("Enter the date of the document (YYYY-MM-DD): ")
               docCat = input("Enter the category of the document: ")
 
               updateDocument(documents, docId, docText, docTitle, docDate, docCat)
@@ -60,7 +60,7 @@ if __name__ == '__main__':
 
           elif (option == "d"):
 
-              index = getIndex(documents)
+              index = generate_inverted_index(db, "documents")
               print(index)
 
           elif (option == "q"):
