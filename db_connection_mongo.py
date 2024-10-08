@@ -1,14 +1,12 @@
-#-------------------------------------------------------------------------
-# AUTHOR: Matthew Plascencia
-# FILENAME: db_connection_mongo.py
-# SPECIFICATION: A program that is the backend for creating, editing and deleting entries into the database.
-# FOR: CS 5180- Assignment #2
-# TIME SPENT: 5Hours
-#-----------------------------------------------------------*/
+
 from pymongo import MongoClient
+import datetime
+from collections import Counter
+import re
+
 
 def connectDataBase():
-   client = MongoClient("mongodb://localhost:27017/")
+    client = MongoClient("mongodb://localhost:27017/")
     db_name = input("Enter the name of the database you want to manipulate: ")
     db = client[db_name]  
     return db
