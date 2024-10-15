@@ -6,6 +6,7 @@
 # TIME SPENT: 5 hours
 #-----------------------------------------------------------*/
 
+
 from pymongo import MongoClient
 import datetime
 from collections import Counter
@@ -19,56 +20,66 @@ def connectDataBase():
     return db
 
 def createDocument(collection, docId, docText, docTitle, docDate, docCat):
-    document = {
-        "_id": int(docId),
-        "text": docText,
-        "title": docTitle,
-        "date": docDate,
-        "category": docCat
-    }
-    collection.insert_one(document)
-    print("Document created successfully.")
+    words = docText.lower().split()  
+    term_counts = Counter(words) 
+    terms = [{'term': term, 'count': count, 'num_chars': len(term)} for term, count in term_counts.items()]
 
-def updateDocument(collection, docId, docText, docTitle, docDate, docCat):
-    collection.update_one(
-        {"_id": int(docId)},
-        {"$set": {
-            "text": docText,
-            "title": docTitle,
-            "date": docDate,
-            "category": docCat
-        }}
-    )
-    print("Document updated successfully.")
+    final_document = {
+        '_id': int(docId),  
+        'text': docText,
+        'title': docTitle,
+        'date': datetime.datetime.strptime(docDate, '%Y-%m-%d'),
+        'category': docCat,
+        'terms': terms
+    }
+    result = col.insert_one(final_document)
+    print(f"Document inserted with _id: {result.inserted_id}")
+
+
+def updateDocument(col, docId, docText, docTitle, docDate, docCat):
+    doc_id = int(docId)
+
+    delete_result = col.delete_one({'_id': doc_id})
+    if delete_result.deleted_count == 0:
+        print(f"No document found with _id {docId}. Nothing was deleted.")
+    else:
+        print(f"Document with _id {docId} deleted.")
+    new_document = {
+        '_id': doc_id,
+        'text': docText,
+        'title': docTitle,
+        'date': datetime.datetime.strptime(docDate, '%Y-%m-%d'),
+        'category': docCat
+    }
+    # Insert the new document
+    insert_result = col.insert_one(new_document)
+    print(f"New document inserted with _id {insert_result.inserted_id}")
 
 def deleteDocument(collection, docId):
     collection.delete_one({"_id": int(docId)})
     print("Document deleted successfully.")
 
-def generate_inverted_index(db, collection_name):
-    collection = db[collection_name]
+def getIndex(col):
+    
+    documents = col.find()  
     inverted_index = {}
 
-    documents = collection.find()
-   
     for doc in documents:
-        
-        terms = re.findall(r'\b\w+\b', doc['text'].lower())  
-        term_counts = Counter(terms)  
-        
-        for term, count in term_counts.items():
-            if term not in inverted_index:
-                inverted_index[term] = {}
-            if doc['title'] in inverted_index[term]:
-                inverted_index[term][doc['title']] += count
-            else:
-                inverted_index[term][doc['title']] = count
+        if 'text' in doc and 'title' in doc:  
+            words = doc['text'].lower().split()  
+            for word in words:
+                if word not in inverted_index:
+                    inverted_index[word] = {}
+                if doc['title'] in inverted_index[word]:
+                    inverted_index[word][doc['title']] += 1
+                else:
+                    inverted_index[word][doc['title']] = 1
 
-    
-    sorted_inverted_index = {term: inverted_index[term] for term in sorted(inverted_index)}
-
+   
     formatted_output = {}
-    for term, docs in sorted_inverted_index.items():
-        formatted_output[term] = ', '.join([f'{title}:{count}' for title, count in docs.items()])
+    for term, titles in inverted_index.items():
+        formatted_output[term] = ', '.join([f'{title}:{count}' for title, count in titles.items()])
 
     return formatted_output
+
+
